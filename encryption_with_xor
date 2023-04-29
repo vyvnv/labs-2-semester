@@ -1,0 +1,72 @@
+#include <stdio.h>
+#include <stdbool.h>
+#include <stdlib.h>
+#include <string.h>
+
+
+
+void EncodeDecode(FILE *ptrfile, FILE *ptrfile2, char *key)
+{
+
+    fseek(ptrfile, 0, SEEK_SET); 
+    int length = strlen(key); 
+    char  message; 
+    int ix = 0; 
+    while(fscanf(ptrfile,"%c",&message) != -1) {
+        message ^= key[ix];
+        fputc(message, ptrfile2);
+        ix++;
+        if (ix == length - 1) ix = 0;
+       
+    }
+    
+}
+
+bool EqualityCheck(FILE *ptrfile1, FILE *ptrfile2)
+{
+    fseek(ptrfile1, 0, SEEK_SET);
+    fseek(ptrfile2, 0, SEEK_SET);
+    bool equal = true;
+    char file1, file2;
+
+    while (equal && !feof(ptrfile1) && !feof(ptrfile2))
+    {    
+        file1 = fgetc(ptrfile1);
+        file2 = fgetc(ptrfile2);
+        equal = (file1 == file2);
+    }
+    return equal; 
+}
+
+int main()
+{
+    FILE *ptrfile1 = fopen("file1.txt", "r+");
+    FILE *ptrfile2 = fopen("file2.txt", "r+");
+    FILE *ptrfile3 = fopen("file3.txt", "r+");
+
+    if (ptrfile1 && ptrfile2 && ptrfile3) {
+        
+    char key[] = "secret_key111";
+
+   EncodeDecode(ptrfile1, ptrfile2, key);
+   EncodeDecode(ptrfile2, ptrfile3, key);
+    
+    if(EqualityCheck(ptrfile1, ptrfile3))
+    {
+        printf("Equal\n");
+    }
+    else
+        printf("Different\n");
+    
+
+
+    fclose(ptrfile1);
+    fclose(ptrfile2);
+    fclose(ptrfile3);
+    }
+
+    else printf("Couldn't open one of files or both");
+    
+    return 0;
+}
+
