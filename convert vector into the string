@@ -1,0 +1,280 @@
+
+#include <stdio.h> 
+#include <stdlib.h> 
+#include <string.h> 
+#include <stdbool.h> 
+ 
+struct b_vector{ 
+    unsigned char *ptr_b_vector; 
+    size_t size; 
+}; 
+ 
+void prt_vector(struct b_vector *vector) 
+{ 
+    unsigned char mask; 
+    printf("Вектор LTR:"); 
+    for(size_t ix_byte = 0; ix_byte < vector->size; ix_byte++){ 
+        printf(" "); 
+        for(unsigned char ix_bit_ltr = 0, ix_bit_rtl = 7; ix_bit_ltr < 8; ix_bit_ltr++, ix_bit_rtl--){ 
+            mask = 1 << ix_bit_rtl; 
+            if(vector->ptr_b_vector[ix_byte] & mask){ 
+                printf("1"); 
+            }else{ 
+                printf("0"); 
+            } 
+        } 
+    } 
+} 
+ 
+struct b_vector *convert_vector_from_string(char *string) 
+{ 
+    int len = strlen(string); 
+    struct b_vector *result = malloc(sizeof(struct b_vector)); 
+    result->size = ((len- 1) / 8) + 1; //? 
+    result->ptr_b_vector = malloc(result->size); 
+ 
+    for(int i = 0; i < len; i++){ 
+        set_bit(result->ptr_b_vector, i, string[i] != '0'); 
+    } 
+ 
+    return result; 
+} 
+ 
+void set_bit(unsigned char *vector, int bit_number_ltr_in_arr, bool bit) 
+{ 
+    int ix_bit_ltr = bit_number_ltr_in_arr; 
+    int ix_bit_rtl = 7 - ix_bit_ltr; 
+    unsigned char mask = 1 << ix_bit_rtl; 
+    int byte = bit_number_ltr_in_arr/8; 
+    if(bit){ 
+        vector[byte] |= mask; 
+    }else{ 
+        vector[byte]  &= ~mask; 
+    } 
+} 
+struct b_vector *end_of_two_vectors(unsigned char *first_vector, unsigned char *second_vector) 
+{ 
+ 
+    struct b_vector *result = malloc(sizeof(struct b_vector)); 
+    result->ptr_b_vector = malloc(sizeof(first_vector)); 
+    result->size = 3; 
+ 
+    for(int i = 0; i < 3; i++) 
+        result->ptr_b_vector[i] = first_vector[i] & second_vector[i]; 
+ 
+    return result; 
+ 
+} 
+ 
+struct b_vector *sum_of_two_vectors(unsigned char *first_vector, unsigned char *second_vector) 
+{ 
+ 
+    struct b_vector *result = malloc(sizeof(struct b_vector)); 
+    result->ptr_b_vector = malloc(sizeof(first_vector)); 
+    result->size = 3; 
+ 
+    for(int i = 0; i < 3; i++) 
+        result->ptr_b_vector[i] = first_vector[i] | second_vector[i]; 
+ 
+    return result; 
+ 
+} 
+ 
+struct b_vector *xor_of_two_vectors(unsigned char *first_vector, unsigned char *second_vector) 
+{ 
+ 
+    struct b_vector *result = malloc(sizeof(struct b_vector)); 
+    result->ptr_b_vector = malloc(sizeof(first_vector)); 
+    result->size = 3; 
+ 
+    for(int i = 0; i < 3; i++) 
+        result->ptr_b_vector[i] = first_vector[i] ^ second_vector[i]; 
+ 
+    return result; 
+ 
+} 
+ 
+struct b_vector *invert_vector(unsigned char *vector) 
+{ 
+    struct b_vector *result = malloc(sizeof(struct b_vector)); 
+    result->ptr_b_vector = malloc(sizeof(vector)); 
+    result->size = 3; 
+ 
+        for(size_t i = 0; i < result->size; i++){ 
+            result->ptr_b_vector[i] = ~vector[i]; 
+        } 
+    return result; 
+} 
+ 
+void shiftRight(unsigned char *vector, size_t bits, size_t k) 
+{ 
+    unsigned char mask; 
+    if( k >= bits ){ 
+        size_t bytes = bits/8; 
+        for(size_t i = 0; i < bytes; i++){ 
+            vector[i] = vector[i] & 0; 
+        } 
+    } 
+} 
+ 
+void shiftLeft(unsigned char *vector, size_t bits, size_t k) 
+{ 
+    unsigned char mask; 
+    if( k >= bits ){ 
+        size_t bytes = bits/8; 
+        for(size_t i = 0; i < bytes; i++){ 
+            vector[i] = vector[i] & 0; 
+        } 
+    } 
+ 
+} 
+ 
+char *convert_from_vector_to_string(unsigned char *vector, size_t size, char *string) 
+{ 
+    unsigned char mask; 
+    printf("\n"); 
+    int j; 
+    while(j < size*8){ 
+        for(int ix_byte = 0; ix_byte < size; ix_byte++){ 
+            for(unsigned char ix_bit_ltr = 0, ix_bit_rtl = 7; ix_bit_ltr < 8; ix_bit_ltr++, ix_bit_rtl--){ 
+                mask = 1 << ix_bit_rtl; 
+                if(vector[ix_byte] & mask){ 
+                    string[j] = '1'; 
+                    printf("1"); 
+                    j++; 
+                }else{ 
+                    printf("0"); 
+                    string[j] = '0'; 
+                    j++; 
+                } 
+            } 
+        }
+    } 
+    string[j] = '\0';
+    return string; 
+} 
+ 
+int main() 
+{ 
+    struct b_vector vector_one; 
+    unsigned char string_one[3] = {10,23,9}; 
+    vector_one.ptr_b_vector = string_one; 
+    vector_one.size = 3; 
+ 
+    struct b_vector vector_two; 
+    unsigned char string_two[3] = {10,23,9}; 
+    vector_two.ptr_b_vector = string_two; 
+    vector_two.size = 3; 
+ 
+    struct b_vector *vector_of_end = end_of_two_vectors(vector_one.ptr_b_vector, vector_two.ptr_b_vector); 
+    printf("End &\n"); 
+    prt_vector(vector_of_end); 
+ 
+    printf("\n"); 
+    for(int i = 0; i < 120; i++){ 
+        printf("-"); 
+    } 
+ 
+    struct b_vector *vector_of_sum = sum_of_two_vectors(vector_one.ptr_b_vector, vector_two.ptr_b_vector); 
+    printf("Sum |\n"); 
+    prt_vector(vector_of_sum); 
+ 
+ 
+    printf("\n"); 
+    for(int i = 0; i < 120; i++){ 
+        printf("-"); 
+    } 
+ 
+    struct b_vector *vector_of_xor = xor_of_two_vectors(vector_one.ptr_b_vector, vector_two.ptr_b_vector); 
+    printf("Xor ^\n"); 
+    prt_vector(vector_of_xor); 
+ 
+    printf("\n"); 
+    for(int i = 0; i < 120; i++){ 
+        printf("-"); 
+    } 
+ 
+    struct b_vector *first_vector_invert = invert_vector(vector_one.ptr_b_vector); 
+    printf("Инвертированный первый вектор\n"); 
+    prt_vector(first_vector_invert); 
+ 
+    printf("\n"); 
+    for(int i = 0; i < 120; i++){ 
+        printf("-"); 
+    } 
+ 
+    struct b_vector *second_vector_invert = invert_vector(vector_two.ptr_b_vector); 
+    printf("Инвертированный второй вектор\n"); 
+    prt_vector(second_vector_invert); 
+ 
+    printf("\n"); 
+    for(int i = 0; i < 120; i++){ 
+        printf("-"); 
+    } 
+ 
+    struct b_vector vector_from_data; 
+    unsigned char content[3] = {'a','b','c'}; 
+    vector_from_data.ptr_b_vector = content; 
+    vector_from_data.size = 3; 
+ 
+    printf("Данные - "); 
+    for(size_t i = 0; i < vector_from_data.size; i++){ 
+        printf("%c ",content[i]); 
+    } 
+    printf("\n"); 
+    prt_vector(&vector_from_data); 
+ 
+ 
+    printf("\n"); 
+    for(int i = 0; i < 120; i++){ 
+        printf("-"); 
+    } 
+    size_t shift_right_on = 8*4; 
+    prt_vector(&vector_one); 
+    printf("\nСдвиг вправо на %d\n", shift_right_on); 
+    shiftRight(vector_one.ptr_b_vector, 8*vector_one.size, shift_right_on); 
+    prt_vector(&vector_one); 
+ 
+    printf("\n"); 
+    for(int i = 0; i < 120; i++){ 
+        printf("-"); 
+    } 
+ 
+    size_t shift_left_on = 8*4; 
+    prt_vector(&vector_two); 
+    printf("\nСдвиг влево на %d\n", shift_left_on); 
+    shiftLeft(vector_two.ptr_b_vector, 8*vector_one.size, shift_left_on); 
+    prt_vector(&vector_two); 
+ 
+ 
+    printf("\n"); 
+    for(int i = 0; i < 120; i++){ 
+        printf("-"); 
+    } 
+ 
+    char string[11]="abcde00011"; 
+    printf("Конвертация строки в вектор\nСтрока - %s\n",string); 
+    struct b_vector *vector_from_string = convert_vector_from_string(string); 
+    prt_vector(vector_from_string); 
+ 
+    printf("\n"); 
+    for(int i = 0; i < 120; i++){ 
+        printf("-"); 
+    } 
+ 
+    printf("Конвертация вектора в строку\n"); 
+    prt_vector(vector_from_string); 
+    char *string_vector = (char*)calloc(vector_from_string->size*8, sizeof(char));
+    convert_from_vector_to_string(vector_from_string->ptr_b_vector, vector_from_string->size,string_vector); 
+    printf("\nСтрока - "); 
+    printf("%s ",string_vector); 
+ 
+ 
+    printf("\n"); 
+    for(int i = 0; i < 120; i++){ 
+        printf("-"); 
+    } 
+    printf("\n"); 
+ 
+    return 0; 
+}
