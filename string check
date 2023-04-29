@@ -1,0 +1,57 @@
+#include <stdlib.h>
+#include <stdio.h>
+#include <locale.h>
+#include <string.h>
+
+int findSubString(char* string, char* substring) {
+    if (string  == NULL || substring == NULL) 
+    {
+        return -1;
+    }
+    int str_len = strlen(string), sub_len =  strlen(substring), flag, i, j;
+
+    if (str_len < sub_len) return -1; // если длина строки меньше, поиск невозможен
+    for (i = 0; i < str_len - sub_len + 1; i++) { 
+        flag = 1;
+        for (j = 0; (j < sub_len) && flag; j++) {
+            if (string[i + j] != substring[j]) 
+                flag = 0;
+        }
+        if (flag) return i;
+    }
+    return -1;
+}
+
+int main() {
+    setlocale(LC_ALL, "Russian");
+    char* myString = "4abcaabc";				 
+	char* myString2 = "abc";					   
+    int sub_len = strlen(myString2);
+    int str_len = strlen(myString);
+    char * tx = myString;
+    int positions[100] = { 0 };
+    int i = 0;
+    int count = 0; // количество вхождений
+    
+   while(i != -1 && *tx != '\0')
+   {
+    i = findSubString(tx, myString2);
+     if ( i >= 0 ) 
+      {
+        positions[count] += i + (tx - myString);
+        tx +=sub_len + i;
+        count++;
+      }
+   }
+    if (count > 0) {
+        printf("Array of positions:\n");
+        for (i = 0; i < count; i++)
+        {
+        printf("%d ", positions[i]);
+        }
+    }
+    else printf("No such substrings in the string");
+
+    return 0;
+}
+
